@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test zonas del puerto de valencia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ebfff1;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        #title {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #question-number {
+            font-size: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #question-text {
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+        .option-btn.correct {
+            background-color: #90EE90;
+            border-color: #32CD32;
+        }
+        .option-btn.incorrect {
+            background-color: #FFB6C1;
+            border-color: #FF0000;
+        }
+        #stats-container, #question-options-container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border: 1px solid #000000;
+        }
+        #question-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="stats-container" style="display:none;"></div>
+    <div id="question-container">
+        <div id="question-options-container">
+            <h1 id="title">Test Zonas del Puerto de Valencia</h1>
+            <img id="question-image" alt="Imagen de la pregunta">
+            <div id="question-text"></div>
+            <div id="options"></div>
+            <h2 id="question-number"></h2>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Qué zona corresponde al número 1?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Ampliación Norte del puerto", "Dique del Este y Muelle Norte", "Muelle Levante", "Marina Real"],
+                correct: 0
+            },
+            {
+                question: "¿Qué zona corresponde al número 2?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Ampliación Norte del puerto", "Dique del Este y Muelle Norte", "Muelle Levante", "Marina Real"],
+                correct: 1
+            },
+            {
+                question: "¿Qué zona corresponde al número 3?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Ampliación Norte del puerto", "Dique del Este y Muelle Norte", "Muelle Levante", "Marina Real"],
+                correct: 2
+            },
+            {
+                question: "¿Qué zona corresponde al número 4?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Ampliación Norte del puerto", "Dique del Este y Muelle Norte", "Muelle Levante", "Marina Real"],
+                correct: 3
+            },
+            {
+                question: "¿Qué zona corresponde al número 5?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Muelle de Poniente y Transversales", "Muelle Espigon Turia y Turia", "Muelle Sur", "Ampliación Sur del puerto"],
+                correct: 0
+            },
+            {
+            question: "¿Qué zona corresponde al número 6?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Muelle de Poniente y Transversales", "Muelle Espigon Turia y Turia", "Muelle Sur", "Ampliación Sur del puerto"],
+                correct: 1
+            },
+            {
+            question: "¿Qué zona corresponde al número 7?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Muelle de Poniente y Transversales", "Muelle Espigon Turia y Turia", "Muelle Sur", "Ampliación Sur del puerto"],
+                correct: 2
+            },
+            {
+            question: "¿Qué zona corresponde al número 8?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Muelle de Poniente y Transversales", "Muelle Espigon Turia y Turia", "Muelle Sur", "Ampliación Sur del puerto"],
+                correct: 3
+            },
+
+            {
+            question: "¿Qué zona corresponde al número 9?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Muelle de Poniente y Transversales", "Club Nático de Valencia", "Muelle Sur", "Ampliación Sur del puerto"],
+                correct: 1
+            },
+            {
+            question: "¿Qué zona corresponde al número 10?",
+                image: "Puerto de valencia Zonas.png",
+                options: ["Ampliación Norte del puerto", "Club Nático de Valencia", "Muelle Sur", "Área Exterior"],
+                correct: 3
+            },
+
+        ];
+
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let answers = [];
+        let shuffledQuestions = [];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function initQuiz() {
+            shuffledQuestions = [...questions];
+            shuffleArray(shuffledQuestions);
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            answers = [];
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= shuffledQuestions.length) {
+                showStats();
+                return;
+            }
+            
+            const question = shuffledQuestions[currentQuestionIndex];
+            document.getElementById('question-number').textContent = `Pregunta ${currentQuestionIndex + 1} de ${shuffledQuestions.length}`;
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('question-image').src = question.image;
+            document.getElementById('question-image').alt = `Imagen para la pregunta ${currentQuestionIndex + 1}`;
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'option-btn';
+                button.onclick = () => checkAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            const question = shuffledQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            const isCorrect = selectedIndex === question.correct;
+            answers.push({
+                question: question.question,
+                userAnswer: question.options[selectedIndex],
+                correctAnswer: question.options[question.correct],
+                isCorrect: isCorrect
+            });
+
+            buttons.forEach((button, index) => {
+                if (index === question.correct) {
+                    button.classList.add('correct');
+                } else if (index === selectedIndex && !isCorrect) {
+                    button.classList.add('incorrect');
+                }
+                button.disabled = true;
+            });
+
+            if (isCorrect) {
+                correctAnswers++;
+            } else {
+                incorrectAnswers++;
+            }
+
+            setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                loadQuestion();
+            } else {
+                showStats();
+            }
+        }
+
+        function showStats() {
+            document.getElementById('question-container').style.display = 'none';
+            const statsContainer = document.getElementById('stats-container');
+            statsContainer.style.display = 'block';
+            
+            const percentCorrect = ((correctAnswers / shuffledQuestions.length) * 100).toFixed(2);
+            
+            let resultHTML = `
+                <h2 style="color: black; margin-bottom: 20px; text-align: center;">Test completado</h2>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="color: black; margin: 10px 0;">Respuestas correctas: <span style="color: green; font-weight: bold;">${correctAnswers}</span></p>
+                    <p style="color: black; margin: 10px 0;">Respuestas incorrectas: <span style="color: red; font-weight: bold;">${incorrectAnswers}</span></p>
+                    <p style="color: black; margin: 10px 0;">Porcentaje de aciertos: <span style="font-weight: bold;">${percentCorrect}%</span></p>
+                </div>
+                <div style="width: 300px; height: 300px; margin: 0 auto;">
+                    <canvas id="resultChart"></canvas>
+                </div>
+            `;
+
+            if (incorrectAnswers > 0) {
+                resultHTML += '<h3 style="color: black; margin-top: 30px;">Resumen de respuestas incorrectas:</h3>';
+                answers.forEach((answer, index) => {
+                    if (!answer.isCorrect) {
+                        resultHTML += `
+                            <div style="margin-bottom: 20px; padding: 15px; border: 1px solid red; border-radius: 5px; background-color: #fff;">
+                                <p style="color: black; margin: 5px 0;"><strong>Pregunta ${index + 1}: ${answer.question}</strong></p>
+                                <p style="color: red; margin: 5px 0;">Tu respuesta: ${answer.userAnswer}</p>
+                                <p style="color: green; margin: 5px 0;">Respuesta correcta: ${answer.correctAnswer}</p>
+                            </div>
+                        `;
+                    }
+                });
+            } else {
+                resultHTML += '<h3 style="color: black; margin-top: 30px; text-align: center;">¡Felicidades! Has respondido correctamente todas las preguntas.</h3>';
+            }
+
+            statsContainer.innerHTML = resultHTML;
+
+            new Chart(document.getElementById('resultChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Correctas', 'Incorrectas'],
+                    datasets: [{
+                        data: [correctAnswers, incorrectAnswers],
+                        backgroundColor: ['#90EE90', '#FFB6C1'],
+                        borderColor: ['#32CD32', '#FF0000'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    title: {
+                        display: true,
+                        text: 'Resultados del test'
+                    }
+                }
+            });
+
+            window.scrollTo(0, 0);
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
